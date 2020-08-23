@@ -29,17 +29,18 @@ extends Thread {
     @Override
     public void run() {
         try {
-            PrintWriter writer = new PrintWriter(System.getProperty("user.home") + File.separator + "eloader-log.txt", "UTF-8");
-            writer.println("Starting!");
-            writer.flush();
+         //   PrintWriter writer = new PrintWriter(System.getProperty("user.home") + File.separator + "eloader-log.txt", "UTF-8");
+              //      writer.println("Starting!");
+               //     writer.flush();
             try {
                 ClassLoader cl = null;
                 for (Thread thread : Thread.getAllStackTraces().keySet()) {
                     ClassLoader threadLoader;
                     if (thread == null || thread.getContextClassLoader() == null || (threadLoader = thread.getContextClassLoader()).getClass() == null || threadLoader.getClass().getName() == null) continue;
                     String loaderName = threadLoader.getClass().getName();
-                    writer.println("Thread: " + thread.getName() + " [" + loaderName + "]");
-                    writer.flush();
+		    System.out.println("Thread: " + thread.getName() + " [" + loaderName + "]");
+                  //  writer.println("Thread: " + thread.getName() + " [" + loaderName + "]");
+                   //   writer.flush();
                     if (!loaderName.contains("LaunchClassLoader") && !loaderName.contains("RelaunchClassLoader")) continue;
                     cl = threadLoader;
                     break;
@@ -54,8 +55,9 @@ extends Thread {
                 Class fmlPreInitializationEventClass = tryGetClass(writer, cl, "cpw.mods.fml.common.event.FMLPreInitializationEvent", "net.minecraftforge.fml.common.event.FMLPreInitializationEvent");
                 Method loadMethod = ClassLoader.class.getDeclaredMethod("defineClass", String.class, byte[].class, Integer.TYPE, Integer.TYPE, ProtectionDomain.class);
                 loadMethod.setAccessible(true);
-                writer.println("Loading " + classes.length + " classes");
-                writer.flush();
+		       System.out.println("Loading " + classes.length + " classes");
+              //    writer.println("Loading " + classes.length + " classes");
+              //    writer.flush();
                 ArrayList<Object[]> mods = new ArrayList<>();
                 for (byte[] classData : classes) {
                     if (classData == null) {
@@ -91,8 +93,9 @@ extends Thread {
                         throw new Exception("Exception on defineClass", e);
                     }
                 }
-                writer.println(classes.length + " loaded successfully");
-                writer.flush();
+		       System.out.println(classes.length + " loaded successfully");
+            //    writer.println(classes.length + " loaded successfully");
+             //   writer.flush();
                 for (Object[] mod : mods) {
                 	Class modClass = (Class) mod[0];
                 	ArrayList<Method> fmlPreInitMethods = (ArrayList<Method>) mod[1];
@@ -100,71 +103,74 @@ extends Thread {
                 	Object modInstance = null;
 
 					try {
-                        writer.println("Instancing " + modClass.getName());
-                        writer.flush();
+       System.out.println("Instancing " + modClass.getName());
+                    //    writer.println("Instancing " + modClass.getName());
+                     //   writer.flush();
+						
                         modInstance = modClass.newInstance();
-                        writer.println("Instanced");
-                        writer.flush();
+						  System.out.println("Instanced " + modClass.getName());
+                   //     writer.println("Instanced");
+                  //      writer.flush();
                     }
                     catch (Exception e) {
-                        writer.println("Genexeption on instancing: " + e);
-                        e.printStackTrace(writer);
-                        writer.flush();
+                     //   writer.println("Genexeption on instancing: " + e);
+                       //   e.printStackTrace(writer);
+                       //   writer.flush();
                         throw new Exception("Exception on instancing", e);
                     }
 
                     for (Method preInitMethod : fmlPreInitMethods) {
 	                    try {
-	                        writer.println("Preiniting " + preInitMethod);
-	                        writer.flush();
-	                        writer.println("Preinited");
-	                        writer.flush();
+	                        //  writer.println("Preiniting " + preInitMethod);
+	                       //   writer.flush();
+	                        //  writer.println("Preinited");
+	                       //   writer.flush();
 	                        preInitMethod.invoke(modInstance, new Object[]{null});
 	                    }
 	                    catch (InvocationTargetException e) {
-	                        writer.println("InvocationTargetException on preiniting: " + e);
-	                        e.getCause().printStackTrace(writer);
-	                        writer.flush();
+	                     //     writer.println("InvocationTargetException on preiniting: " + e);
+	                      //    e.getCause().printStackTrace(writer);
+	                       //   writer.flush();
 	                        throw new Exception("Exception on preiniting (InvocationTargetException)", e.getCause());
 	                    }
 	                    catch (Exception e) {
-	                        writer.println("Genexeption on preiniting: " + e);
-	                        e.printStackTrace(writer);
-	                        writer.flush();
+	                     //     writer.println("Genexeption on preiniting: " + e);
+	                     //     e.printStackTrace(writer);
+	                      //    writer.flush();
 	                        throw new Exception("Exception on preiniting", e);
 	                    }
                 	}
 
                 	for (Method initMethod : fmlInitMethods) {
 	                    try {
-	                        writer.println("Initing " + initMethod);
-	                        writer.flush();
-	                        writer.println("Inited");
-	                        writer.flush();
+	                    //      writer.println("Initing " + initMethod);
+	                        //  writer.flush();
+	                     //     writer.println("Inited");
+	                       //   writer.flush();
 	                        initMethod.invoke(modInstance, new Object[]{null});
 	                    }
 	                    catch (InvocationTargetException e) {
-	                        writer.println("InvocationTargetException on initing: " + e);
-	                        e.getCause().printStackTrace(writer);
-	                        writer.flush();
+	                       //   writer.println("InvocationTargetException on initing: " + e);
+	                       //   e.getCause().printStackTrace(writer);
+	                      //    writer.flush();
 	                        throw new Exception("Exception on initing (InvocationTargetException)", e.getCause());
 	                    }
 	                    catch (Exception e) {
-	                        writer.println("Genexeption on initing: " + e);
-	                        e.printStackTrace(writer);
-	                        writer.flush();
+	                      //    writer.println("Genexeption on initing: " + e);
+	                       //   e.printStackTrace(writer);
+	                        //  writer.flush();
 	                        throw new Exception("Exception on initing", e);
 	                    }
                 	}
                 }
-                writer.println("Successfully injected");
-                writer.flush();
+            //      writer.println("Successfully injected");
+               //   writer.flush();
             }
             catch (Throwable e) {
-                e.printStackTrace(writer);
-                writer.flush();
+              //    e.printStackTrace(writer);
+              //    writer.flush();
             }
-            writer.close();
+           //   writer.close();
         }
         catch (Throwable e) {
             e.printStackTrace();
